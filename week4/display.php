@@ -1,19 +1,28 @@
 <?php
 
-session_start();
+$name = $_GET["name"];
+$pob = $_GET["pob"];
+$dob = $_GET["dob"];
+$address = $_GET["address"];
+$gender = $_GET["gender"];
+$telephone = $_GET["telephone"];
+$email = $_GET["email"];
+$image = $_GET["image"];
 
-if (!isset($_SESSION["student"])) {
+$parentName = $_GET["parentName"];
+$parentTelephone = $_GET["parentTelephone"];
+$relationship = $_GET["relationship"];
 
-    header("Location: Assignment.php");
-    exit();
-
-}
-
-$student = $_SESSION["student"];
+$studentID = $_GET["studentID"];
+$faculty = $_GET["faculty"];
+$department = $_GET["department"];
+$class = $_GET["class"];
+$registrationDate = $_GET["registrationDate"];
 
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -25,6 +34,7 @@ $student = $_SESSION["student"];
 
     <title>Student Information</title>
 
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -32,16 +42,15 @@ $student = $_SESSION["student"];
 
 </head>
 
+
 <body class="bg-light">
 
 
-<!-- NAVBAR -->
-
-<nav class="navbar navbar-dark bg-primary shadow">
+<nav class="navbar navbar-dark bg-primary">
 
     <div class="container">
 
-        <span class="navbar-brand fw-bold">
+        <span class="navbar-brand">
             Student Registration System
         </span>
 
@@ -50,327 +59,174 @@ $student = $_SESSION["student"];
 </nav>
 
 
-<div class="container py-5">
+<div class="container mt-5 mb-5">
 
-    <div class="row justify-content-center">
 
-        <div class="col-lg-9">
+    <div class="alert alert-success">
 
+        <h4>
+            Registration Successful!
+        </h4>
 
-            <!-- SUCCESS MESSAGE -->
+        Student information has been submitted successfully.
 
-            <div class="alert alert-success shadow-sm">
+    </div>
 
-                <h5 class="alert-heading">
-                    Registration Successful!
-                </h5>
 
-                <p class="mb-0">
-                    The student information has been successfully registered.
-                </p>
+    <div class="card shadow">
 
-            </div>
+        <div class="card-header bg-primary text-white text-center">
 
+            <h3>
+                Student Information
+            </h3>
 
-            <!-- MAIN CARD -->
+        </div>
 
-            <div class="card border-0 shadow">
 
+        <div class="card-body">
 
-                <div class="card-header bg-primary text-white text-center py-3">
 
-                    <h3 class="mb-0">
-                        Student Information
-                    </h3>
+            <!-- PERSONAL -->
 
-                </div>
+            <h5 class="text-primary mb-3">
+                Personal Information
+            </h5>
 
 
-                <div class="card-body p-4">
+            <table class="table table-bordered">
 
+                <tr>
+                    <th>Name</th>
+                    <td><?php echo $name; ?></td>
+                </tr>
 
-                    <!-- PERSONAL INFORMATION -->
+                <tr>
+                    <th>Place of Birth</th>
+                    <td><?php echo $pob; ?></td>
+                </tr>
 
-                    <h5 class="text-primary border-bottom pb-2 mb-3">
-                        Personal Information
-                    </h5>
+                <tr>
+                    <th>Date of Birth</th>
+                    <td><?php echo $dob; ?></td>
+                </tr>
 
+                <tr>
+                    <th>Address</th>
+                    <td><?php echo $address; ?></td>
+                </tr>
 
-                    <div class="table-responsive">
+                <tr>
+                    <th>Gender</th>
+                    <td><?php echo $gender; ?></td>
+                </tr>
 
-                        <table class="table table-bordered table-hover align-middle">
+                <tr>
+                    <th>Telephone</th>
+                    <td><?php echo $telephone; ?></td>
+                </tr>
 
-                            <tbody>
+                <tr>
+                    <th>Email</th>
+                    <td><?php echo $email; ?></td>
+                </tr>
 
-                                <tr>
-                                    <th class="table-light">
-                                        Name
-                                    </th>
+                <tr>
+                    <th>Image</th>
 
-                                    <td>
-                                        <?= htmlspecialchars($student["name"]) ?>
-                                    </td>
-                                </tr>
+                    <td>
 
-
-                                <tr>
-                                    <th class="table-light">
-                                        Place of Birth
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["pob"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th class="table-light">
-                                        Date of Birth
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["dob"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th class="table-light">
-                                        Address
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["address"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th class="table-light">
-                                        Gender
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["gender"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th class="table-light">
-                                        Telephone
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["telephone"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th class="table-light">
-                                        Email
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["email"]) ?>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Student Image
-                                    </th>
-
-                                    <td>
-
-                                        <img
-                                            src="uploads/<?= htmlspecialchars($student["image"]) ?>"
-                                            alt="Student Image"
-                                            class="img-thumbnail"
-                                            style="width: 150px; height: 150px; object-fit: cover;"
-                                        >
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- PARENT INFORMATION -->
-
-                    <h5 class="text-primary border-bottom pb-2 mb-3 mt-5">
-                        Parent Information
-                    </h5>
-
-
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-hover">
-
-                            <tbody>
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Parent Name
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["parentName"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Parent Telephone
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["parentTelephone"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Relationship
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["relationship"]) ?>
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- ACADEMIC INFORMATION -->
-
-                    <h5 class="text-primary border-bottom pb-2 mb-3 mt-5">
-                        Academic Information
-                    </h5>
-
-
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-hover">
-
-                            <tbody>
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Student ID
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["studentID"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Faculty
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["faculty"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Department
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["department"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Class
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["class"]) ?>
-                                    </td>
-
-                                </tr>
-
-
-                                <tr>
-
-                                    <th class="table-light">
-                                        Registration Date
-                                    </th>
-
-                                    <td>
-                                        <?= htmlspecialchars($student["registrationDate"]) ?>
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-
-                    <!-- BUTTONS -->
-
-                    <div class="d-flex gap-2 mt-4">
-
-                        <a
-                            href="Assignment.php"
-                            class="btn btn-primary"
+                        <img
+                            src="uploads/<?php echo $image; ?>"
+                            width="150"
+                            height="150"
+                            class="img-thumbnail"
                         >
-                            Register Another Student
-                        </a>
 
-                        <button
-                            onclick="window.print()"
-                            class="btn btn-secondary"
-                        >
-                            Print
-                        </button>
+                    </td>
 
-                    </div>
+                </tr>
+
+            </table>
 
 
-                </div>
+            <!-- PARENT -->
 
-            </div>
+            <h5 class="text-primary mt-5 mb-3">
+
+                Parent Information
+
+            </h5>
+
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th>Parent Name</th>
+                    <td><?php echo $parentName; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Parent Telephone</th>
+                    <td><?php echo $parentTelephone; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Relationship</th>
+                    <td><?php echo $relationship; ?></td>
+                </tr>
+
+            </table>
+
+
+            <!-- ACADEMIC -->
+
+            <h5 class="text-primary mt-5 mb-3">
+
+                Academic Information
+
+            </h5>
+
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th>Student ID</th>
+                    <td><?php echo $studentID; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Faculty</th>
+                    <td><?php echo $faculty; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Department</th>
+                    <td><?php echo $department; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Class</th>
+                    <td><?php echo $class; ?></td>
+                </tr>
+
+                <tr>
+                    <th>Registration Date</th>
+                    <td><?php echo $registrationDate; ?></td>
+                </tr>
+
+            </table>
+
+
+            <a
+                href="Assignment.php"
+                class="btn btn-primary"
+            >
+
+                Register Another Student
+
+            </a>
+
 
         </div>
 
@@ -378,10 +234,6 @@ $student = $_SESSION["student"];
 
 </div>
 
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
 
 </body>
 

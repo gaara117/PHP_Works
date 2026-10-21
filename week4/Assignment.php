@@ -1,91 +1,92 @@
 <?php
 
-session_start();
-
-$errors = [];
-
-$name = "";
-$pob = "";
-$dob = "";
-$address = "";
-$gender = "";
-$telephone = "";
-$email = "";
-
-$parentName = "";
-$parentTelephone = "";
-$relationship = "";
-
-$studentID = "";
-$faculty = "";
-$department = "";
-$class = "";
-$registrationDate = "";
+$errors = array();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // =========================
-    // PERSONAL INFORMATION
-    // =========================
+    // Personal Information
+    $name = $_POST["name"];
+    $pob = $_POST["pob"];
+    $dob = $_POST["dob"];
+    $address = $_POST["address"];
+    $gender = $_POST["gender"];
+    $telephone = $_POST["telephone"];
+    $email = $_POST["email"];
 
-    $name = trim($_POST["name"] ?? "");
-    $pob = trim($_POST["pob"] ?? "");
-    $dob = trim($_POST["dob"] ?? "");
-    $address = trim($_POST["address"] ?? "");
-    $gender = trim($_POST["gender"] ?? "");
-    $telephone = trim($_POST["telephone"] ?? "");
-    $email = trim($_POST["email"] ?? "");
+    // Parent Information
+    $parentName = $_POST["parentName"];
+    $parentTelephone = $_POST["parentTelephone"];
+    $relationship = $_POST["relationship"];
+
+    // Academic Information
+    $studentID = $_POST["studentID"];
+    $faculty = $_POST["faculty"];
+    $department = $_POST["department"];
+    $class = $_POST["class"];
+    $registrationDate = $_POST["registrationDate"];
+
+
+    // =========================
+    // PERSONAL VALIDATION
+    // =========================
 
     if (empty($name)) {
         $errors["name"] = "Name is required.";
-    } elseif (!preg_match("/^[a-zA-Z ]+$/", $name)) {
+    }
+    elseif (!preg_match("/^[a-zA-Z ]+$/", $name)) {
         $errors["name"] = "Name must contain only letters and spaces.";
     }
+
 
     if (empty($pob)) {
         $errors["pob"] = "Place of Birth is required.";
     }
 
+
     if (empty($dob)) {
         $errors["dob"] = "Date of Birth is required.";
     }
+
 
     if (empty($address)) {
         $errors["address"] = "Address is required.";
     }
 
+
     if (empty($gender)) {
         $errors["gender"] = "Gender is required.";
     }
+
 
     if (empty($telephone)) {
         $errors["telephone"] = "Telephone is required.";
     }
 
+
     if (empty($email)) {
         $errors["email"] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors["email"] = "Please enter a valid email address.";
+    }
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors["email"] = "Please enter a valid email.";
     }
 
 
     // =========================
-    // PARENT INFORMATION
+    // PARENT VALIDATION
     // =========================
-
-    $parentName = trim($_POST["parentName"] ?? "");
-    $parentTelephone = trim($_POST["parentTelephone"] ?? "");
-    $relationship = trim($_POST["relationship"] ?? "");
 
     if (empty($parentName)) {
         $errors["parentName"] = "Parent Name is required.";
-    } elseif (!preg_match("/^[a-zA-Z ]+$/", $parentName)) {
+    }
+    elseif (!preg_match("/^[a-zA-Z ]+$/", $parentName)) {
         $errors["parentName"] = "Parent Name must contain only letters and spaces.";
     }
+
 
     if (empty($parentTelephone)) {
         $errors["parentTelephone"] = "Parent Telephone is required.";
     }
+
 
     if (empty($relationship)) {
         $errors["relationship"] = "Relationship is required.";
@@ -93,30 +94,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // =========================
-    // ACADEMIC INFORMATION
+    // ACADEMIC VALIDATION
     // =========================
-
-    $studentID = trim($_POST["studentID"] ?? "");
-    $faculty = trim($_POST["faculty"] ?? "");
-    $department = trim($_POST["department"] ?? "");
-    $class = trim($_POST["class"] ?? "");
-    $registrationDate = trim($_POST["registrationDate"] ?? "");
 
     if (empty($studentID)) {
         $errors["studentID"] = "Student ID is required.";
     }
 
+
     if (empty($faculty)) {
         $errors["faculty"] = "Faculty is required.";
     }
+
 
     if (empty($department)) {
         $errors["department"] = "Department is required.";
     }
 
+
     if (empty($class)) {
         $errors["class"] = "Class is required.";
     }
+
 
     if (empty($registrationDate)) {
         $errors["registrationDate"] = "Registration Date is required.";
@@ -127,37 +126,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // IMAGE VALIDATION
     // =========================
 
-    $imageName = "";
-
-    if (!isset($_FILES["image"]) || $_FILES["image"]["error"] == 4) {
+    if ($_FILES["image"]["error"] == 4) {
 
         $errors["image"] = "Student image is required.";
 
-    } else {
+    }
+    else {
 
-        $allowedTypes = ["jpg", "jpeg", "png", "gif"];
+        $imageName = $_FILES["image"]["name"];
+        $imageType = $_FILES["image"]["type"];
 
-        $fileName = $_FILES["image"]["name"];
-
-        $extension = strtolower(
-            pathinfo($fileName, PATHINFO_EXTENSION)
-        );
-
-        if (!in_array($extension, $allowedTypes)) {
+        if (
+            $imageType != "image/jpeg" &&
+            $imageType != "image/png" &&
+            $imageType != "image/gif"
+        ) {
 
             $errors["image"] =
-                "Only JPG, JPEG, PNG and GIF files are allowed.";
+                "Only JPG, PNG and GIF images are allowed.";
 
-        } else {
-
-            $imageName =
-                time() . "_" . basename($fileName);
         }
     }
 
 
     // =========================
-    // SUCCESS
+    // IF NO ERRORS
     // =========================
 
     if (empty($errors)) {
@@ -166,34 +159,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mkdir("uploads");
         }
 
+        $imageName = $_FILES["image"]["name"];
+
         move_uploaded_file(
             $_FILES["image"]["tmp_name"],
             "uploads/" . $imageName
         );
 
-        $_SESSION["student"] = [
 
-            "name" => $name,
-            "pob" => $pob,
-            "dob" => $dob,
-            "address" => $address,
-            "gender" => $gender,
-            "telephone" => $telephone,
-            "email" => $email,
-            "image" => $imageName,
+        // Send data to display.php
 
-            "parentName" => $parentName,
-            "parentTelephone" => $parentTelephone,
-            "relationship" => $relationship,
+        $data =
+            "name=" . urlencode($name) .
+            "&pob=" . urlencode($pob) .
+            "&dob=" . urlencode($dob) .
+            "&address=" . urlencode($address) .
+            "&gender=" . urlencode($gender) .
+            "&telephone=" . urlencode($telephone) .
+            "&email=" . urlencode($email) .
+            "&image=" . urlencode($imageName) .
 
-            "studentID" => $studentID,
-            "faculty" => $faculty,
-            "department" => $department,
-            "class" => $class,
-            "registrationDate" => $registrationDate
-        ];
+            "&parentName=" . urlencode($parentName) .
+            "&parentTelephone=" . urlencode($parentTelephone) .
+            "&relationship=" . urlencode($relationship) .
 
-        header("Location: display.php");
+            "&studentID=" . urlencode($studentID) .
+            "&faculty=" . urlencode($faculty) .
+            "&department=" . urlencode($department) .
+            "&class=" . urlencode($class) .
+            "&registrationDate=" . urlencode($registrationDate);
+
+
+        header("Location: display.php?" . $data);
         exit();
     }
 }
@@ -201,6 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -212,7 +210,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <title>Student Registration</title>
 
-    <!-- Bootstrap CSS -->
+
+    <!-- Bootstrap -->
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -220,16 +220,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </head>
 
+
 <body class="bg-light">
 
 
-<!-- HEADER -->
+<!-- NAVBAR -->
 
-<nav class="navbar navbar-dark bg-primary shadow">
+<nav class="navbar navbar-dark bg-primary">
 
     <div class="container">
 
-        <span class="navbar-brand mb-0 h1">
+        <span class="navbar-brand">
             Student Registration System
         </span>
 
@@ -238,33 +239,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </nav>
 
 
-<!-- MAIN CONTAINER -->
-
-<div class="container py-5">
+<div class="container mt-5 mb-5">
 
     <div class="row justify-content-center">
 
         <div class="col-lg-9">
 
 
-            <!-- CARD -->
+            <div class="card shadow">
 
-            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white text-center">
 
-                <div class="card-header bg-primary text-white text-center py-3">
-
-                    <h3 class="mb-0">
+                    <h3>
                         Student Registration Form
                     </h3>
-
-                    <small>
-                        Please fill in all required information
-                    </small>
 
                 </div>
 
 
-                <div class="card-body p-4">
+                <div class="card-body">
 
 
                     <form
@@ -273,545 +266,486 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     >
 
 
-                        <!-- ================= -->
                         <!-- PERSONAL -->
-                        <!-- ================= -->
 
-                        <div class="mb-4">
-
-                            <h5 class="text-primary border-bottom pb-2">
-                                <i class="bi bi-person"></i>
-                                Personal Information
-                            </h5>
-
-                        </div>
+                        <h5 class="text-primary border-bottom pb-2 mb-4">
+                            Personal Information
+                        </h5>
 
 
-                        <div class="row g-3">
+                        <div class="row">
 
 
-                            <!-- NAME -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Name
                                 </label>
 
                                 <input
                                     type="text"
                                     name="name"
-                                    id="name"
-                                    class="form-control <?= isset($errors["name"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($name) ?>"
-                                    placeholder="Enter student name"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["name"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["name"] ?>
-                                    </div>
+                                if (isset($errors["name"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["name"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- POB -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Place of Birth
                                 </label>
 
                                 <input
                                     type="text"
                                     name="pob"
-                                    id="pob"
-                                    class="form-control <?= isset($errors["pob"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($pob) ?>"
-                                    placeholder="Enter place of birth"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["pob"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["pob"] ?>
-                                    </div>
+                                if (isset($errors["pob"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["pob"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- DOB -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Date of Birth
                                 </label>
 
                                 <input
                                     type="date"
                                     name="dob"
-                                    id="dob"
-                                    class="form-control <?= isset($errors["dob"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($dob) ?>"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["dob"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["dob"] ?>
-                                    </div>
+                                if (isset($errors["dob"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["dob"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- GENDER -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Gender
                                 </label>
 
                                 <select
                                     name="gender"
-                                    id="gender"
-                                    class="form-select <?= isset($errors["gender"]) ? 'is-invalid' : '' ?>"
+                                    class="form-select"
                                 >
 
                                     <option value="">
                                         Select Gender
                                     </option>
 
-                                    <option
-                                        value="Male"
-                                        <?= $gender == "Male" ? "selected" : "" ?>
-                                    >
+                                    <option value="Male">
                                         Male
                                     </option>
 
-                                    <option
-                                        value="Female"
-                                        <?= $gender == "Female" ? "selected" : "" ?>
-                                    >
+                                    <option value="Female">
                                         Female
                                     </option>
 
                                 </select>
 
-                                <?php if (isset($errors["gender"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["gender"] ?>
-                                    </div>
+                                if (isset($errors["gender"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["gender"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- ADDRESS -->
+                            <div class="col-12 mb-3">
 
-                            <div class="col-12">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Address
                                 </label>
 
                                 <input
                                     type="text"
                                     name="address"
-                                    id="address"
-                                    class="form-control <?= isset($errors["address"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($address) ?>"
-                                    placeholder="Enter address"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["address"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["address"] ?>
-                                    </div>
+                                if (isset($errors["address"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["address"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- TELEPHONE -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Telephone
                                 </label>
 
                                 <input
                                     type="text"
                                     name="telephone"
-                                    id="telephone"
-                                    class="form-control <?= isset($errors["telephone"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($telephone) ?>"
-                                    placeholder="Enter telephone"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["telephone"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["telephone"] ?>
-                                    </div>
+                                if (isset($errors["telephone"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["telephone"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- EMAIL -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Email
                                 </label>
 
                                 <input
-                                    type="email"
+                                    type="text"
                                     name="email"
-                                    id="email"
-                                    class="form-control <?= isset($errors["email"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($email) ?>"
-                                    placeholder="example@gmail.com"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["email"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["email"] ?>
-                                    </div>
+                                if (isset($errors["email"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["email"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- IMAGE -->
+                            <div class="col-12 mb-3">
 
-                            <div class="col-12">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Student Image
                                 </label>
 
                                 <input
                                     type="file"
                                     name="image"
-                                    id="image"
-                                    class="form-control <?= isset($errors["image"]) ? 'is-invalid' : '' ?>"
+                                    class="form-control"
                                     accept=".jpg,.jpeg,.png,.gif"
                                 >
 
-                                <div class="form-text">
-                                    Allowed: JPG, JPEG, PNG, GIF
-                                </div>
+                                <?php
 
-                                <?php if (isset($errors["image"])): ?>
+                                if (isset($errors["image"])) {
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["image"] ?>
-                                    </div>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["image"];
+                                    echo "</small>";
 
-                                <?php endif; ?>
+                                }
+
+                                ?>
 
                             </div>
 
                         </div>
 
 
-                        <!-- ================= -->
                         <!-- PARENT -->
-                        <!-- ================= -->
 
-                        <div class="mt-5 mb-4">
+                        <h5 class="text-primary border-bottom pb-2 mt-4 mb-4">
 
-                            <h5 class="text-primary border-bottom pb-2">
-                                Parent Information
-                            </h5>
+                            Parent Information
 
-                        </div>
+                        </h5>
 
 
-                        <div class="row g-3">
+                        <div class="row">
 
 
-                            <!-- PARENT NAME -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Parent Name
                                 </label>
 
                                 <input
                                     type="text"
                                     name="parentName"
-                                    id="parentName"
-                                    class="form-control <?= isset($errors["parentName"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($parentName) ?>"
-                                    placeholder="Enter parent name"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["parentName"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["parentName"] ?>
-                                    </div>
+                                if (isset($errors["parentName"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["parentName"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- PARENT TELEPHONE -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Parent Telephone
                                 </label>
 
                                 <input
                                     type="text"
                                     name="parentTelephone"
-                                    id="parentTelephone"
-                                    class="form-control <?= isset($errors["parentTelephone"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($parentTelephone) ?>"
-                                    placeholder="Enter parent telephone"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["parentTelephone"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["parentTelephone"] ?>
-                                    </div>
+                                if (isset($errors["parentTelephone"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["parentTelephone"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- RELATIONSHIP -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Relationship
                                 </label>
 
-                                <select
+                                <input
+                                    type="text"
                                     name="relationship"
-                                    id="relationship"
-                                    class="form-select <?= isset($errors["relationship"]) ? 'is-invalid' : '' ?>"
+                                    class="form-control"
                                 >
 
-                                    <option value="">
-                                        Select Relationship
-                                    </option>
+                                <?php
 
-                                    <option
-                                        value="Father"
-                                        <?= $relationship == "Father" ? "selected" : "" ?>
-                                    >
-                                        Father
-                                    </option>
+                                if (isset($errors["relationship"])) {
 
-                                    <option
-                                        value="Mother"
-                                        <?= $relationship == "Mother" ? "selected" : "" ?>
-                                    >
-                                        Mother
-                                    </option>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["relationship"];
+                                    echo "</small>";
 
-                                    <option
-                                        value="Guardian"
-                                        <?= $relationship == "Guardian" ? "selected" : "" ?>
-                                    >
-                                        Guardian
-                                    </option>
+                                }
 
-                                </select>
-
-                                <?php if (isset($errors["relationship"])): ?>
-
-                                    <div class="invalid-feedback">
-                                        <?= $errors["relationship"] ?>
-                                    </div>
-
-                                <?php endif; ?>
+                                ?>
 
                             </div>
 
                         </div>
 
 
-                        <!-- ================= -->
                         <!-- ACADEMIC -->
-                        <!-- ================= -->
 
-                        <div class="mt-5 mb-4">
+                        <h5 class="text-primary border-bottom pb-2 mt-4 mb-4">
 
-                            <h5 class="text-primary border-bottom pb-2">
-                                Academic Information
-                            </h5>
+                            Academic Information
 
-                        </div>
+                        </h5>
 
 
-                        <div class="row g-3">
+                        <div class="row">
 
 
-                            <!-- STUDENT ID -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Student ID
                                 </label>
 
                                 <input
                                     type="text"
                                     name="studentID"
-                                    id="studentID"
-                                    class="form-control <?= isset($errors["studentID"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($studentID) ?>"
-                                    placeholder="Enter student ID"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["studentID"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["studentID"] ?>
-                                    </div>
+                                if (isset($errors["studentID"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["studentID"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- FACULTY -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Faculty
                                 </label>
 
                                 <input
                                     type="text"
                                     name="faculty"
-                                    id="faculty"
-                                    class="form-control <?= isset($errors["faculty"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($faculty) ?>"
-                                    placeholder="Enter faculty"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["faculty"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["faculty"] ?>
-                                    </div>
+                                if (isset($errors["faculty"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["faculty"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- DEPARTMENT -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Department
                                 </label>
 
                                 <input
                                     type="text"
                                     name="department"
-                                    id="department"
-                                    class="form-control <?= isset($errors["department"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($department) ?>"
-                                    placeholder="Enter department"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["department"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["department"] ?>
-                                    </div>
+                                if (isset($errors["department"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["department"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- CLASS -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Class
                                 </label>
 
                                 <input
                                     type="text"
                                     name="class"
-                                    id="class"
-                                    class="form-control <?= isset($errors["class"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($class) ?>"
-                                    placeholder="Enter class"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["class"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["class"] ?>
-                                    </div>
+                                if (isset($errors["class"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["class"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
 
-                            <!-- REGISTRATION DATE -->
+                            <div class="col-md-6 mb-3">
 
-                            <div class="col-md-6">
-
-                                <label class="form-label fw-semibold">
+                                <label class="form-label">
                                     Registration Date
                                 </label>
 
                                 <input
                                     type="date"
                                     name="registrationDate"
-                                    id="registrationDate"
-                                    class="form-control <?= isset($errors["registrationDate"]) ? 'is-invalid' : '' ?>"
-                                    value="<?= htmlspecialchars($registrationDate) ?>"
+                                    class="form-control"
                                 >
 
-                                <?php if (isset($errors["registrationDate"])): ?>
+                                <?php
 
-                                    <div class="invalid-feedback">
-                                        <?= $errors["registrationDate"] ?>
-                                    </div>
+                                if (isset($errors["registrationDate"])) {
 
-                                <?php endif; ?>
+                                    echo "<small class='text-danger'>";
+                                    echo $errors["registrationDate"];
+                                    echo "</small>";
+
+                                }
+
+                                ?>
 
                             </div>
 
@@ -820,16 +754,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <!-- BUTTON -->
 
-                        <div class="d-grid mt-5">
+                        <div class="d-grid mt-4">
 
                             <button
                                 type="submit"
                                 class="btn btn-primary btn-lg"
                             >
+
                                 Register Student
+
                             </button>
 
                         </div>
+
 
                     </form>
 
@@ -843,12 +780,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </div>
 
-
-<!-- Bootstrap JS -->
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
 
 </body>
 
